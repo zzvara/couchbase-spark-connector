@@ -21,7 +21,7 @@ import com.couchbase.spark.rdd._
 
 import scala.reflect.ClassTag
 import com.couchbase.client.java.document.Document
-import com.couchbase.client.java.query.N1qlQuery
+import com.couchbase.client.java.query.{AsyncN1qlQueryRow, N1qlQuery}
 import com.couchbase.spark.connection._
 import org.apache.spark.rdd.RDD
 
@@ -75,11 +75,11 @@ class RDDFunctions[T](rdd: RDD[T]) extends Serializable {
 
   def couchbaseQuery(bucketName: String = null, timeout: Option[Duration] = None)
     (implicit evidence: RDD[T] <:< RDD[N1qlQuery])
-  : RDD[CouchbaseQueryRow] = {
+  : RDD[AsyncN1qlQueryRow] = {
     val queryRDD: RDD[N1qlQuery] = rdd
     queryRDD.mapPartitions { valueIterator =>
       if (valueIterator.isEmpty) {
-        Iterator[CouchbaseQueryRow]()
+        Iterator[AsyncN1qlQueryRow]()
       } else {
         new QueryAccessor(cbConfig, OnceIterable(valueIterator).toSeq, bucketName,
           timeout).compute()

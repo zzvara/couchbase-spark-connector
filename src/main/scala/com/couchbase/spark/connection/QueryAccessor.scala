@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit
 
 import com.couchbase.client.core.BackpressureException
 import com.couchbase.client.core.time.Delay
-import com.couchbase.client.java.query.N1qlQuery
+import com.couchbase.client.java.query.{AsyncN1qlQueryRow, N1qlQuery}
 import com.couchbase.client.java.util.retry.RetryBuilder
 import com.couchbase.spark.Logging
 import com.couchbase.spark.internal.LazyIterator
@@ -19,9 +19,9 @@ class QueryAccessor(cbConfig: CouchbaseConfig, query: Seq[N1qlQuery], bucketName
                     timeout: Option[Duration])
   extends Logging {
 
-  def compute(): Iterator[CouchbaseQueryRow] = {
+  def compute(): Iterator[AsyncN1qlQueryRow] = {
     if (query.isEmpty) {
-      return Iterator[CouchbaseQueryRow]()
+      return Iterator[AsyncN1qlQueryRow]()
     }
 
     val bucket = CouchbaseConnection().bucket(cbConfig, bucketName).async()
@@ -52,7 +52,6 @@ class QueryAccessor(cbConfig: CouchbaseConfig, query: Seq[N1qlQuery], bucketName
           })
         })
         .flatMap(_.rows())
-        .map(row => CouchbaseQueryRow(row.value()))
         .toBlocking
         .toIterable
         .iterator

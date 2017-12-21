@@ -15,24 +15,21 @@
  */
 package com.couchbase.spark.rdd
 
-import com.couchbase.client.java.document.json.JsonObject
-import com.couchbase.client.java.query.N1qlQuery
+import com.couchbase.client.java.query.{AsyncN1qlQueryRow, N1qlQuery}
 import com.couchbase.spark.connection.{CouchbaseConfig, QueryAccessor}
 import org.apache.spark.{Partition, SparkContext, TaskContext}
 import org.apache.spark.rdd.RDD
 
 import scala.concurrent.duration.Duration
 
-case class CouchbaseQueryRow(value: JsonObject)
-
 class QueryRDD(@transient private val sc: SparkContext, query: N1qlQuery,
                bucketName: String = null,
                timeout: Option[Duration] = None)
-  extends RDD[CouchbaseQueryRow](sc, Nil) {
+  extends RDD[AsyncN1qlQueryRow](sc, Nil) {
 
   private val cbConfig = CouchbaseConfig(sc.getConf)
 
-  override def compute(split: Partition, context: TaskContext): Iterator[CouchbaseQueryRow] =
+  override def compute(split: Partition, context: TaskContext): Iterator[AsyncN1qlQueryRow] =
     new QueryAccessor(cbConfig, Seq(query), bucketName, timeout).compute()
 
   override protected def getPartitions: Array[Partition] = Array(new CouchbasePartition(0))

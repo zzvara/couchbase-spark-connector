@@ -17,6 +17,7 @@ package com.couchbase.spark.japi;
 
 import com.couchbase.client.java.document.Document;
 import com.couchbase.client.java.document.JsonDocument;
+import com.couchbase.client.java.query.AsyncN1qlQueryRow;
 import com.couchbase.client.java.query.N1qlQuery;
 import com.couchbase.client.java.view.SpatialViewQuery;
 import com.couchbase.client.java.view.ViewQuery;
@@ -209,19 +210,19 @@ public class CouchbaseSparkContext {
         return new SpatialViewRDD(sc, query, bucket, scala.Option.<Duration>apply(Duration.create(timeout, TimeUnit.MILLISECONDS))).toJavaRDD();
     }
 
-    public JavaRDD<CouchbaseQueryRow> couchbaseQuery(final N1qlQuery query) {
+    public JavaRDD<AsyncN1qlQueryRow> couchbaseQuery(final N1qlQuery query) {
         return couchbaseQuery(query, null);
     }
 
-    public JavaRDD<CouchbaseQueryRow> couchbaseQuery(final N1qlQuery query, final String bucket) {
+    public JavaRDD<AsyncN1qlQueryRow> couchbaseQuery(final N1qlQuery query, final String bucket) {
         return new QueryRDD(sc, query, bucket, scala.Option.<Duration>apply(null)).toJavaRDD();
     }
 
-    public JavaRDD<CouchbaseQueryRow> couchbaseQuery(final N1qlQuery query, long timeout) {
+    public JavaRDD<AsyncN1qlQueryRow> couchbaseQuery(final N1qlQuery query, long timeout) {
         return couchbaseQuery(query, null);
     }
 
-    public JavaRDD<CouchbaseQueryRow> couchbaseQuery(final N1qlQuery query, final String bucket, long timeout) {
+    public JavaRDD<AsyncN1qlQueryRow> couchbaseQuery(final N1qlQuery query, final String bucket, long timeout) {
         return new QueryRDD(sc, query, bucket, scala.Option.<Duration>apply(Duration.create(timeout, TimeUnit.MILLISECONDS))).toJavaRDD();
     }
 
